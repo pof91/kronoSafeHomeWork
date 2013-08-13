@@ -4,7 +4,7 @@ appWeather.controller('weatherAppCtrl', function ($scope,$resource) {
 	//creation de la requete
 	var methods = {callback: 'JSON_CALLBACK'};
 	var option = {get: {method: 'JSONP'}};
-	var api = $resource('http://api.wunderground.com/api/fdb61d8a3c1e4be4/geolookup/conditions/forecast/q/France/:location.json', methods, option);
+	var api = $resource('http://api.wunderground.com/api/ea5af3a442586762/geolookup/conditions/forecast/q/France/:location.json', methods, option);
 	var requeteFct = function(location, onSuccess, onError) {
 					return api.get({location: location}, onSuccess, onError);
 				};
