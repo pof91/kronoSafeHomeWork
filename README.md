@@ -16,9 +16,11 @@ premier essai avec angularJs
 
 6 NOK : Adding new kinds of graphics
 
-7 NOK : use less instead of css
+7 NOK : use other data (forecast10day, hourly)
 
-8 NOK : use google graph/Raphael.js
+8 NOK : use less instead of css
+
+9 NOK : use google graph/Raphael.js
 
 
 
@@ -30,3 +32,18 @@ Utilisation :
   - Lancer le serveur : node scripts\web-server.js
   - http://localhost:8000/app/index.html
 
+------------------------
+
+TODO for V1 :
+	a search with "Orsay"
+	http://api.wunderground.com/api/:key/geolookup/q/France/Orsay.json
+	"Here is a list of closest weather stations from orsay"
+	show pws station city/neighborhood(I don't take airport station)
+	the user can choose max distance of these stations
+	the user pick a station in the list
+	http://api.wunderground.com/api/:key/conditions/q/pws:IDSTATION.json
+	conditions = current weather
+
+-------------------------
+Problem :
+	no results for very little city (chuelles,...)
