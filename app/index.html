@@ -5,7 +5,13 @@
 </head>
 <body ng-controller="weatherAppCtrl">
 	<input ng-model="city" type="text">
-	<button ng-click="updateConditions()">Ok</button>
+	<button ng-click="updateCity()">Ok</button>
+	<h2>{{ wS.city }}</h2>
+	<ul>
+	<li ng-repeat="wSAirport in wS.wSAirports">{{wSAirport.city}}: {{distance(wS.lat,wS.lon,wSAirport.lat,wSAirport.lon)}}</li>
+	<li ng-repeat="wSPws in wS.wSPws">{{wSPws.city}}{{wSPws.neighborhood && '/'+wSPws.neighborhood}} : {{distance(wS.lat,wS.lon,wSPws.lat,wSPws.lon)}}</li>
+	</ul>
+	<!-- <button ng-click="updateConditions()">Ok</button>
 	<div ng-show="isVisible">
 		<h2>{{ conditions.location }}</h2>
 		<p>
@@ -23,7 +29,7 @@
 	</div>
 	<div ng-hide="isVisible">
 		{{ greeting }}
-	</div>
+	</div>-->
 
 
 	<script src="lib/angular/angular.min.js"></script>
