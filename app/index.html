@@ -2,48 +2,53 @@
 <head>
 	<meta charset="utf-8">
 	<title>KronoWeather</title>
-	<link rel="stylesheet" href="css/bootstrap.css">
-	<script src="lib/angular/angular.min.js"></script>
-	<script src="js/app.js"></script>
-	<script src="js/directives.js"></script>
-	<script src="js/filters.js"></script>
-    <script src="js/services.js"></script>
-	<script src="js/weatherAppCtrl.js"></script>
-	<script src="lib/angular/angular-resource.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/animation.css">
+	<script type="text/javascript" src="lib/angular/angular.min.js"></script>
+	<script type="text/javascript" src="lib/angular/angular-animate.min.js"></script>
+	<script type="text/javascript" src="lib/angular/angular-resource.min.js"></script>
+	<script type="text/javascript" src="js/app.js"></script>
+	<script type="text/javascript" src="js/directives.js"></script>
+	<script type="text/javascript" src="js/filters.js"></script>
+    <script type="text/javascript" src="js/services.js"></script>
+	<script type="text/javascript" src="js/weatherAppCtrl.js"></script>
 </head>
 <body ng-controller="WeatherAppCtrl">
-	<div>
-	<div ng-hide="isVisible">
-		{{ greeting }}
+	<div style="margin-top: 30px;">
+		<div class="well" style="width: 300px; margin-right: 15px; overflow: hidden;float:left;">
+			<form class="form-search"> 
+				{{ greeting }}
+				<div class="input-append">
+					<input type="text" class="search-query" style="width: 150px; height : 30px" ng-model="citySelect" ng-keydown="checkKeyCode($event)">
+					<button class="btn" ng-mousedown="chooseCity()" >Ok</button>
+				</div>
+				<div style="margin:15px">
+					Sort by : 	<button class="btn" ng-click="predicate='city';reverseCity=!reverseCity;reverse=reverseCity">City</button>
+								<button class="btn" ng-click="predicate='distance';reverseDistance=!reverseDistance;reverse=reverseDistance">Distance</button>
+				</div>
+				<div style="margin:15px">
+					<label for="distanceRange">Filter by Distance :  <span><span>{{distanceRange}}</span> km</span></label>
+					<input type="range" ng-model="distanceRange" min="0" max="40" step="1" style="width: 170px">
+				</div>
+				<ul class="nav">
+					<li class="slide" ng-repeat="wStation in wS | filter:lowerThanDistanceRange | orderBy:predicate:reverse">
+						<a href="#" ng-click="updateConditions(wStation)">{{wStation.city}}{{wStation.neighborhood && '/'+wStation.neighborhood}} ({{wStation.distance}}km)</a>
+					</li>
+				</ul>
+			</form>
+		</div>
+		<div ng-show="isVisible">
+			<h4>Weather's Conditions for : {{ conditions[0].location }}</h4>
+			<p>
+				<img ng-src="{{ conditions[0].weatherIcon }}" alt="{{ conditions[0].weather }}" title="{{ conditions[0].weather }}"><br>
+				Current temp : {{ conditions[0].temperature }}°C
+				<br/>
+				Humidity : {{ conditions[0].humidity }}
+				<br/>
+			</p>
+			<time>Last Update: {{ conditions[0].lastUpdate}}</time>
+		</div>
 	</div>
-	<input ng-model="citySelect" type="text">
-	<button ng-click="chooseCity()">Ok</button>
-	<h2>{{ resultat }}</h2>
-	<ul>
-	<li ng-repeat="wStation in wS">{{wStation.city}}{{wStation.neighborhood && '/'+wStation.neighborhood}} ({{wStation.distance}}km)</li>
-	</ul>
-	</div>
-	<!-- <button ng-click="updateConditions()">Ok</button>
-	<div ng-show="isVisible">
-		<h2>{{ conditions.location }}</h2>
-		<p>
-			<img ng-src="{{ conditions.weatherIcon }}" alt="{{ conditions.weather }}" title="{{ conditions.weather }}"><br>
-			Current temp : {{ conditions.temperature }}°C
-			<br/>
-			Humidity : {{ conditions.humidity }}
-			<br/>
-			Forecast : 
-			<ul>
-				<li ng-repeat="day in conditions.foreCastText">{{day.title}} : {{day.fcttext_metric}}</li>
-			</ul>
-		</p>
-		<time>Last Update: {{ conditions.fetchDate }}</time>
-	</div>
-	<div ng-hide="isVisible">
-		{{ greeting }}
-	</div>-->
-
-
 
 </body>
 </html>
