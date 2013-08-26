@@ -6,47 +6,52 @@
 	<link rel="stylesheet" type="text/css" href="css/animation.css">
 	<script type="text/javascript" src="lib/angular/angular.min.js"></script>
 	<script type="text/javascript" src="lib/angular/angular-animate.min.js"></script>
-	<script type="text/javascript" src="lib/angular/angular-resource.min.js"></script>
+	<script type="text/javascript" src="lib/modernizr.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript" src="js/directives.js"></script>
 	<script type="text/javascript" src="js/filters.js"></script>
     <script type="text/javascript" src="js/services.js"></script>
 	<script type="text/javascript" src="js/weatherAppCtrl.js"></script>
 </head>
-<body ng-controller="WeatherAppCtrl">
-	<div style="margin-top: 30px;">
-		<div class="well" style="width: 300px; margin-right: 15px; overflow: hidden;float:left;">
+<body >
+	<div style="margin-top: 30px;" ng-controller="WeatherAppCtrl">
+		<div class="well" style="width: 300px; margin-right: 15px; overflow: hidden;float:left;">	
 			<form class="form-search"> 
-				{{ greeting }}
 				<div class="input-append">
-					<input type="text" class="search-query" style="width: 150px; height : 30px" ng-model="citySelect" ng-keydown="checkKeyCode($event)">
-					<button class="btn" ng-mousedown="chooseCity()" >Ok</button>
+				<my-autocomplete
+						remote-data="cityRequest.AutoComplete(request,response)" 
+						city-Select="citySelect"
+            			min-input="2" 
+            			restrict="true" 
+           				placeholder="Type City Name">
+   		 		</my-autocomplete>
+   		 		<button class="btn" ng-mousedown="chooseCity()" >Ok</button>
+				<button class="btn" ng-mousedown="geoCity()">I'm lucky</button>
 				</div>
-				<div style="margin:15px">
-					Sort by : 	<button class="btn" ng-click="predicate='city';reverseCity=!reverseCity;reverse=reverseCity">City</button>
-								<button class="btn" ng-click="predicate='distance';reverseDistance=!reverseDistance;reverse=reverseDistance">Distance</button>
-				</div>
-				<div style="margin:15px">
-					<label for="distanceRange">Filter by Distance :  <span><span>{{distanceRange}}</span> km</span></label>
+				<div ng-show="buttonIsVisible" style="margin:15px">
+					Sort by : 	<button class="btn" ng-click="predicate='city';reverse=!reverse">City</button>
+								<button class="btn" ng-click="predicate='distance';reverse=!reverse">Distance</button>
+					<label  ng-init="distanceRange='40'" for="distanceRange">Filter by Distance :  <span><span>{{distanceRange}}</span> km</span></label>
 					<input type="range" ng-model="distanceRange" min="0" max="40" step="1" style="width: 170px">
-				</div>
-				<ul class="nav">
-					<li class="slide" ng-repeat="wStation in wS | filter:lowerThanDistanceRange | orderBy:predicate:reverse">
-						<a href="#" ng-click="updateConditions(wStation)">{{wStation.city}}{{wStation.neighborhood && '/'+wStation.neighborhood}} ({{wStation.distance}}km)</a>
+					<ul class="nav" >
+					<li class="slide" 
+						ng-repeat="wStation in wS | lowerThanDistanceRange:distanceRange | orderBy:predicate:reverse">
+						<a href="#" ng-click="updateConditions(wStation)">{{wStation.city | capitalize}}{{wStation.neighborhood && '/'+wStation.neighborhood}} ({{wStation.distance}}km)</a>
 					</li>
 				</ul>
+				</div>
 			</form>
 		</div>
-		<div ng-show="isVisible">
-			<h4>Weather's Conditions for : {{ conditions[0].location }}</h4>
+		<div ng-show="isVisible" style="display: inline-block;">
+			<h4>Weather's Conditions for : <br/>{{ conditions[0].location }}</h4>
 			<p>
 				<img ng-src="{{ conditions[0].weatherIcon }}" alt="{{ conditions[0].weather }}" title="{{ conditions[0].weather }}"><br>
-				Current temp : {{ conditions[0].temperature }}°C
+				Current temp : {{ conditions[0].temperature | degree}}
 				<br/>
 				Humidity : {{ conditions[0].humidity }}
 				<br/>
 			</p>
-			<time>Last Update: {{ conditions[0].lastUpdate}}</time>
+			<time>Last Update: {{ conditions[0].lastUpdate | date:'EEEE d MMM yyyy @ HH:mm'}}</time>
 		</div>
 	</div>
 

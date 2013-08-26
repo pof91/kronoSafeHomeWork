@@ -1850,7 +1850,7 @@ input.search-query {
           border-radius: 14px 0 0 14px;
 }
 
-.form-search .input-append .btn {
+.form-search .input-append .btn:last-child {
   -webkit-border-radius: 0 14px 14px 0;
      -moz-border-radius: 0 14px 14px 0;
           border-radius: 0 14px 14px 0;
@@ -2903,15 +2903,15 @@ table th[class*="span"],
 }
 
 .dropdown-menu {
-  position: absolute;
+  position: relative;
   top: 100%;
   left: 0;
   z-index: 1000;
   display: none;
   float: left;
   min-width: 160px;
-  padding: 5px 0;
-  margin: 2px 0 0;
+  padding: 0px;
+  margin: 0px;
   list-style: none;
   background-color: #ffffff;
   border: 1px solid #ccc;
@@ -2946,7 +2946,7 @@ table th[class*="span"],
 
 .dropdown-menu > li > a {
   display: block;
-  padding: 3px 20px;
+  padding: 3px 15px;
   clear: both;
   font-weight: normal;
   line-height: 20px;
@@ -2973,6 +2973,7 @@ table th[class*="span"],
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
 .dropdown-menu > .active > a:focus {
+  z-index: 1000;
   color: #ffffff;
   text-decoration: none;
   background-color: #0081c2;

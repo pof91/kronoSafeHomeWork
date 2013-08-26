@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('appWeather',['appWeatherServices','ngAnimate']);
+var appWeather = angular.module('appWeather',['appWeatherServices','ngAnimate']);

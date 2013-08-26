@@ -1,78 +1,63 @@
 'use strict';
-var Distance;
-function WeatherAppCtrl($scope,queryWeather) {
-	$scope.greeting = "Hello world ! Please enter a city in the field";
-	$scope.reverseCity = false;
-	$scope.reverseDistance = false;
+
+var Distance,handle_errors;
+function WeatherAppCtrl($scope,queryWeather, queryCity) {
+	$scope.citySelect = {
+        value: '',
+        zmw : ''
+    };
+    $scope.cityRequest = queryCity;
 	$scope.predicate = "distance";
+	$scope.buttonIsVisible = false;
 	$scope.isVisible = false;
-	$scope.distanceRange = 40;
-	$scope.checkKeyCode =function($event){
-		if ($event.keyCode === 13){
-			$scope.chooseCity();
-		}
-	}
-	$scope.lowerThanDistanceRange = function(item){
-		return item.distance <= $scope.distanceRange;
-	}
 	$scope.chooseCity = function(){
 		$scope.wS = [];
-		var result = queryWeather.query({location:$scope.citySelect,pays:'France',interet:'geolookup'},
-			function(result) {
-				var response = result.response;
-				if (response.error) {
-					$scope.greeting = "Sorry !! " + response.error.description;
-					return $scope.wS = null;
-				}
-				else {
-					var apiLoc = result.location;
-					angular.forEach(apiLoc.nearby_weather_stations.airport.station, function(value,key){
-						var distance = (Distance(apiLoc.lat,apiLoc.lon,value.lat,value.lon)/1000.0);
-						if (distance < 40.0){
-							$scope.wS.push({
-								'city': angular.lowercase(value.city), 
-								'icao' : value.icao, 
-								'distance' : distance
-							});
-						}
-					});
-					angular.forEach(apiLoc.nearby_weather_stations.pws.station, function(value,key){
-						var distance = (Distance(apiLoc.lat,apiLoc.lon,value.lat,value.lon)/1000.0);
-						if (distance < 40.0){
-							$scope.wS.push({
-								'city': angular.lowercase(value.city),
-								'neighborhood': angular.lowercase(value.neighborhood),
-								'pws' : value.id, 
-								'distance' : distance
-							});
-						}
-					});
-					$scope.greeting = "Great !! I found " + $scope.wS.length + " stations, Pick one";
-				}
-			}
-		);
+		if ($scope.citySelect.value !== ''){
+			try {
+            	queryWeather.AutoComplete(
+            		{'location':'zmw:' + $scope.citySelect.zmw,'interet':'geolookup'},
+                	function(data) {
+                   		$scope.wS = data;
+                	}
+                );
+			    $scope.buttonIsVisible = true;	
+        	} catch (ex) {
+        		console.log(ex);
+        		$scope.buttonIsVisible = false;
+        	}
+		}else{
+				$scope.buttonIsVisible = false;
+		}
 	}
 	$scope.updateConditions = function(station) {
+		var location ;
 		$scope.conditions = [];
-		var location = "";
 		if ('pws' in station) location = 'pws:' + station.pws;
+		else if ('lat' in station) location = station.lat;
 		else location = 'icao:' + station.icao;
-		var result = queryWeather.query({location:location,pays:'',interet:'conditions'},
-			function(result) {
-				var response = result.current_observation;
-				$scope.conditions.push({
-					'location' : angular.uppercase(response.observation_location.full),
-					'lastUpdate' : response.observation_time_rfc822,
-					'humidity' : response.relative_humidity,
-					'temperature' : response.temp_c,
-					'weatherIcon' : response.icon_url,
-					'weather' : response.icon
-				});
-			}
-		);
-		$scope.isVisible = true;
+		try {
+            queryWeather.AutoComplete(
+            	{'location' : location},
+                function(data) {
+                    $scope.conditions = data;
+                });
+            $scope.isVisible = true;
+        } catch (ex) {
+        	console.log(ex);
+        	$scope.isVisible = false;
+        }
 	};
-	
+	$scope.geoCity = function(){
+	    if (Modernizr.geolocation) {
+	        navigator.geolocation.getCurrentPosition($scope.getLuckyWeather, handle_errors);
+	    } else {
+	        alert("Geolocation Not Supported! ");
+	    }
+	}
+	$scope.getLuckyWeather = function(position) {
+    	var wu_query = position.coords.latitude + ',' + position.coords.longitude;
+    	$scope.updateConditions({lat : wu_query});
+	}
 
 
 }
@@ -87,4 +72,26 @@ Distance = function(lat_a_degre, lon_a_degre, lat_b_degre, lon_b_degre){
 	var d = R * (Math.PI/2 - Math.asin( Math.sin(lat_b) * Math.sin(lat_a) + Math.cos(lon_b - lon_a) * Math.cos(lat_b) * Math.cos(lat_a)))
 	return parseInt(d);
 }
+
+handle_errors = function(error) {
+    switch (error.code) {
+    case error.PERMISSION_DENIED:
+        alert("user did not share geolocation data");
+        break;
+
+    case error.POSITION_UNAVAILABLE:
+        alert("could not detect current position");
+        break;
+
+    case error.TIMEOUT:
+        alert("retrieving position timedout");
+        break;
+
+    default:
+        alert("unknown error");
+        break;
+    }
+}
+
+
 

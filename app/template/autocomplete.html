@@ -1,0 +1,7 @@
+<span class="dropdown search " ng-class="{open: focused && _choices.length>0}">
+	<input type="text" ng-model="searchTerm" placeholder="{{placeholder}}"  tabindex="1" accesskey="s" class="search-query" style="width: 160px; height : 30px" focused="focused">
+        <ul class="dropdown-menu">
+        	<li ng-repeat="choice in _choices">
+        		<a href="javascript:void(0);" ng-click="selectMe(choice)">{{choice.label}}</a></li> 
+       	</ul>
+</span>
