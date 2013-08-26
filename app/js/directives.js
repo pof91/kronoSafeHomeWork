@@ -18,7 +18,7 @@ appWeather.directive('myAutocomplete', function() {
                 $scope.searchTerm = $scope.lastSearchTerm = choice.label;
             };
             $scope.UpdateSearch = function() {
-                if ($scope.canRefresh()) {
+                if ($scope.searchTerm && $scope.canRefresh()) {
                     $scope.searching = true;
                     $scope.lastSearchTerm = $scope.searchTerm;
                     try {
@@ -37,13 +37,13 @@ appWeather.directive('myAutocomplete', function() {
             }
             $scope.$watch('searchTerm', $scope.UpdateSearch);
             $scope.canRefresh = function() {
-                return ($scope.searchTerm !== "") && ($scope.searchTerm !== $scope.lastSearchTerm) && ($scope.searching != true);
+                return ($scope.searchTerm.length > $scope.minInputLength) && ($scope.searchTerm !== "") && ($scope.searchTerm !== $scope.lastSearchTerm) && ($scope.searching != true);
             };
-            $scope.checkKeyCode = function($event){
+           /* $scope.checkKeyCode = function($event){
                 if ($event.keyCode === 13){
                     $scope.chooseCity();
                 }
-             }
+             }*/
         },
        link: function(scope, iElement, iAttrs, controller) {
             scope._searchTerm = '';
@@ -76,4 +76,74 @@ appWeather.directive("focused", function($timeout) {
         });
         scope.$eval(attrs.focused + '=true')
     }
+});
+
+appWeather.directive('lineChart', function ($timeout) {
+  return {
+    restrict: 'EA',
+    scope: {
+      title:    '@title',
+      width:    '@width',
+      height:   '@height',
+      data:     '=data',
+      selectFn: '&select'
+    },
+    link: function($scope, $elm, $attr) {
+      
+      // Create the data table and instantiate the chart
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'City');
+      data.addColumn('number', 'history');
+      var chart = new google.visualization.LineChart($elm[0]);
+
+      draw();
+      
+      // Watches, to refresh the chart when its data, title or dimensions change
+      $scope.$watch('data', function() {
+        draw();
+      }, true); // true is for deep object equality checking
+
+      // Chart selection handler
+      google.visualization.events.addListener(chart, 'select', function () {
+        var selectedItem = chart.getSelection()[0];
+        if (selectedItem) {
+          $scope.$apply(function () {
+            $scope.selectFn({selectedRowIndex: selectedItem.row});
+          });
+        }
+      });
+        
+      function draw() {
+        if (!draw.triggered) {
+          draw.triggered = true;
+          $timeout(function () {
+            draw.triggered = false;
+            var label, value;
+            data.removeRows(0, data.getNumberOfRows());
+            angular.forEach($scope.data, function(row) {
+              label = row[0];
+              value = parseFloat(row[1], 10);
+                data.addRow([row[0], value]);
+            });
+            var options = {
+                        curveType: "function", 
+                        pointSize: 5,
+                        title: $scope.title,
+                        width: $scope.width,
+                        height: $scope.height,
+                        vAxis: {title: "Temperature"},
+                        hAxis: {title: "City",slantedTextAngle : 30},
+                        animation: {
+                            duration: 1000,
+                            easing: 'out'
+                        }
+                };
+            chart.draw(data, options);
+            // No raw selected
+            $scope.selectFn({selectedRowIndex: undefined});
+          }, 0, true);
+        }
+      }
+    }
+  };
 });
