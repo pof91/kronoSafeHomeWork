@@ -139,8 +139,125 @@ appWeather.directive('lineChart', function ($timeout) {
                         }
                 };
             chart.draw(data, options);
-            // No raw selected
-            $scope.selectFn({selectedRowIndex: undefined});
+          }, 0, true);
+        }
+      }
+    }
+  };
+});
+
+appWeather.directive('lineHourly', function ($timeout) {
+  return {
+    restrict: 'EA',
+    scope: {
+      title:    '@title',
+      width:    '@width',
+      height:   '@height',
+      data:     '=data'
+    },
+    link: function($scope, $elm, $attr) {
+      // Create the data table and instantiate the chart
+      var data = new google.visualization.DataTable();
+      data.addColumn('number', 'hour');
+      data.addColumn('number', 'temp');
+      var chart = new google.visualization.LineChart($elm[0]);
+
+      draw();
+      
+      // Watches, to refresh the chart when its data, title or dimensions change
+      $scope.$watch('data', function() {
+        draw();
+      }, true); // true is for deep object equality checking
+        
+      function draw() {
+        if (!draw.triggered) {
+          draw.triggered = true;
+          $timeout(function () {
+            draw.triggered = false;
+            var label, value;
+            data.removeRows(0, data.getNumberOfRows());
+            angular.forEach($scope.data, function(row) {
+              label = row[2];
+              value = parseFloat(row[1], 10);
+                data.addRow([row[0], value]);
+            });
+            var options = {
+                        curveType: "function", 
+                        pointSize: 1,
+                        title: $scope.title,
+                        width: $scope.width,
+                        height: $scope.height,
+                        vAxis: {title: "Temperature"},
+                        hAxis: {title: "Hour",slantedTextAngle : 30},
+                        animation: {
+                            duration: 1000,
+                            easing: 'out'
+                        }
+                };
+            chart.draw(data, options);
+          }, 0, true);
+        }
+      }
+    }
+  };
+});
+
+appWeather.directive('lineDaily', function ($timeout) {
+  return {
+    restrict: 'EA',
+    scope: {
+      title:    '@title',
+      width:    '@width',
+      height:   '@height',
+      data:     '=data'
+    },
+    link: function($scope, $elm, $attr) {
+      // Create the data table and instantiate the chart
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'day');
+      data.addColumn('number', 'tempMax');
+	  data.addColumn({type : 'string', role : 'tooltip'})
+	  data.addColumn('number', 'tempMin');
+	  data.addColumn({type : 'string', role : 'tooltip'})
+      var chart = new google.visualization.AreaChart($elm[0]);
+
+      draw();
+      
+      // Watches, to refresh the chart when its data, title or dimensions change
+      $scope.$watch('data', function() {
+        draw();
+      }, true); // true is for deep object equality checking
+        
+      function draw() {
+        if (!draw.triggered) {
+          draw.triggered = true;
+          $timeout(function () {
+            draw.triggered = false;
+            var label, value1, value2;
+            data.removeRows(0, data.getNumberOfRows());
+            angular.forEach($scope.data, function(row) {
+              label = row[0];
+              value1 = parseFloat(row[1], 10);
+			  value2 = parseFloat(row[2], 10);
+              data.addRow([row[0], value1, row[3], value2, row[3]]);
+            });
+            var options = {
+			    allowHtml : true,
+				displayAnnotations : true,
+				colors : ['#FF7905','#351EFF'],
+				curveType: "function", 
+				pointSize: 0,
+				title: $scope.title,
+				width: $scope.width,
+				height: $scope.height,
+				vAxis: {title: "Temperatures"},
+				hAxis: {title: "Days",slantedTextAngle : 30},
+				animation: {
+					duration: 1000,
+					easing: 'out'
+				},
+                };
+            chart.draw(data, options);
           }, 0, true);
         }
       }

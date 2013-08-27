@@ -39,6 +39,25 @@ angular.module('appWeatherServices', []).
 								});
 							}
 							else{
+								var apiFore = data.forecast.simpleforecast.forecastday;
+								var forecast10dayTab = []
+								angular.forEach(apiFore, function(value,key){
+									forecast10dayTab.push([
+											value.date.weekday,
+											value.high.celsius, 
+											value.low.celsius,
+											value.icon
+									]);
+								});
+								var apiHour = data.hourly_forecast;
+								var hourlyTab = [];
+								angular.forEach(apiHour, function(value,key){
+									hourlyTab.push([
+											key+1, 
+											value.temp.metric, 
+											'img/' +value.icon + '.gif'
+									]);
+								});
 								var apiObs = data.current_observation;
 								retour = {};
 								retour = {
@@ -50,6 +69,8 @@ angular.module('appWeatherServices', []).
 									weather : apiObs.weather,
 									feelslike : apiObs.feelslike_c,
 									uv : apiObs.UV,
+									hourly : hourlyTab,
+									forecast : forecast10dayTab
 								};
 							}
 						});

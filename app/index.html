@@ -36,39 +36,36 @@
 			</form>
 		</div>
 		<div style="display: inline-block;">
-			<line-chart data="chartData" title="Sum up" width="600" height="320" select="selectRow(selectedRowIndex)"></line-chart>
-			<div ng-show="conditions.visible" ng-animate="{show: 'fade-show', hide: 'fade-hide'}" class="well" style="display: inline-block;">
-				<div data-ng-switch="selected" data-ng-animate="'wave'" class="slide-frame">
-					<div ng-repeat="station in history" >
-	      				<div data-ng-switch-when="$index">
-							<h4>Weather's Conditions for : <br/>{{ station.location }}</h4>
-							<p>
-								<img ng-src="{{ station.weatherIcon }}" alt="{{ station.weather }}" title="{{ station.weather }}"><br>
-								Current temp : {{ station.temperature | degree}} (feels like {{ station.feelslike | degree}})
-								<br/>
-								Humidity : {{ station.humidity }}
-								<br/>
-								UV : {{ station.uv }}
-								<br/>
-								<time>Last Update: {{ station.lastUpdate | date:'EEEE d MMM yyyy @ HH:mm'}}</time>
-							</p>
+			<div ng-show="first" ng-animate="{show: 'fade-show', hide: 'fade-hide'}" class="well2" style="display: inline-block;">
+					<div ng-repeat="station in history" ng-show="what($index,station)" ng-animate="{show: 'fade-show', hide: 'fade-hide'}" class="abso">
+						<h4>Weather's Conditions for : <br/>{{ station.location }}</h4>
+						<button class="btn" ng-click="chart=chooseGraph('hourly')">Hourly</button>
+						<button class="btn" ng-click="chart=chooseGraph('daily')">Daily</button>
+						<button class="btn" ng-click="chart=chooseGraph('history')">Sum up</button>
+						<p>
+							<img ng-src="{{ station.weatherIcon }}" alt="{{ station.weather }}" title="{{ station.weather }}"><br>
+							Current temp : {{ station.temperature | degree}} (feels like {{ station.feelslike | degree}})
+							<br/>
+							Humidity : {{ station.humidity }}
+							<br/>
+							UV : {{ station.uv }}
+							<br/>
+							<time>Last Update: {{ station.lastUpdate | date:'EEEE d MMM yyyy @ HH:mm'}}</time>
+						</p>
+					</div>
+					<div ng-switch="" on="chart" ng-animate="'wave'" class="wave-frame">
+						<div ng-switch-when="hourly">
+							<line-hourly data="stationSel.hourly" title="forecast Hourly (next 36 Hours)" width="600" height="320"></line-hourly>
+						</div>
+						<div ng-switch-when="daily">
+							<line-daily data="stationSel.forecast" title="forecast daily (next 10 Days)" width="600" height="320"></line-daily>
+						</div>
+						<div ng-switch-default>
+							<line-chart data="chartData" title="Sum up" width="600" height="320" select="selectRow(selectedRowIndex)"></line-chart>
 						</div>
 					</div>
-					<div ng-switch-default>
-							<h4>Weather's Conditions for : <br/>{{ conditions.data.location }}</h4>
-							<p>
-								<img ng-src="{{ conditions.data.weatherIcon }}" alt="{{ conditions.data.weather }}" title="{{ conditions.data.weather }}"><br>
-								Current temp : {{ conditions.data.temperature | degree}} (feels like {{ conditions.data.feelslike | degree}})
-								<br/>
-								Humidity : {{ conditions.data.humidity }}
-								<br/>
-								UV : {{ conditions.data.uv }}
-								<br/>
-								<time>Last Update: {{ conditions.data.lastUpdate | date:'EEEE d MMM yyyy @ HH:mm'}}</time>
-							</p>
-					</div>
-				</div>
 			</div>
+
 		</div>
 	</div>
 	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
